@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import './style.css';
 import Auth from "./components/auth.jsx";
-import { auth, db } from "./config/firebase.js";
+import { auth, db, storage } from "./config/firebase.js";
 import { addDoc, collection, doc, getDocs, deleteDoc, updateDoc } from 'firebase/firestore';
+import { ref, uploadBytes } from 'firebase/storage';
 
 const App = () => {
     const [albumList, setAlbumList] = React.useState([]);
@@ -12,6 +13,7 @@ const App = () => {
     const [genre, setGenre] = React.useState('');
     const [releaseDate, setReleaseDate] = React.useState(0);
     const [updatedGenre, setUpdatedGenre] = React.useState('');
+    const [fileUpload, setFileUpload] = React.useState(null);
 
     const albumsCollectionRef = collection(db, 'music-albums');
 
@@ -66,6 +68,17 @@ const App = () => {
         }
     }
 
+    const uploadFile = async () => {
+        if (!fileUpload) return;
+        const filesFolderRef = ref(storage, `projectFiles/${fileUpload.name}`);
+
+        try {
+            await uploadBytes(filesFolderRef, fileUpload);
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
     useEffect(() => {
         getAlbumList();
     }, []);
@@ -73,7 +86,6 @@ const App = () => {
     return (
         <div>
             <Auth />
-            { /* generate a form to add an album. The form should have fields for artist, title, genre, and release date in that order. The artist, title, and genre fields are string values, the releaseDate is a number value. */ }
             <div>
                 <input type="text" placeholder="Artist" onChange={e=> setArtist(e.target.value)}/>
                 <input type="text" placeholder="Title" onChange={e=> setTitle(e.target.value)}/>
@@ -94,6 +106,10 @@ const App = () => {
                         <button onClick={() => updateAlbum(album.id)}>Update Genre</button>
                     </div>
                 ))}
+            </div>
+            <div>
+                <input type="file" onChange={e => setFileUpload(e.target.files[0])}/>
+                <button onClick={uploadFile}>Upload file</button>
             </div>
         </div>
     );

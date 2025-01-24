@@ -1,9 +1,9 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
+import { getStorage } from 'firebase/storage';
 import { localConfigs } from "../localConfigs.js";
 
-// Remove secret before pushing back up to repo.
 const firebase = {
     apiKey: localConfigs?.apiKey,
     authDomain: "fir-crash-course-w-react.firebaseapp.com",
@@ -18,3 +18,4 @@ const app = initializeApp(firebase);
 export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
 export const db = getFirestore(app);
+export const storage = getStorage(app);
